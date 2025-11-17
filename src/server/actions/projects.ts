@@ -11,7 +11,18 @@ export async function createProjectTemplate(formData: FormData) {
   const defaultPrice = formData.get("defaultPrice")
     ? parseInt(formData.get("defaultPrice") as string)
     : 0;
-  const defaultCurrency = (formData.get("defaultCurrency") as string) || "SEK";
+  const defaultPaymentType =
+    (formData.get("defaultPaymentType") as "one-time" | "monthly" | "yearly") ||
+    "one-time";
+  const defaultCurrency =
+    (formData.get("defaultCurrency") as
+      | "SEK"
+      | "USD"
+      | "EUR"
+      | "GBP"
+      | "DKK"
+      | "NOK"
+      | "CHF") || "SEK";
   const defaultTermsAndConditions = formData.get(
     "defaultTermsAndConditions"
   ) as string | null;
@@ -27,6 +38,7 @@ export async function createProjectTemplate(formData: FormData) {
         name,
         description: description || null,
         defaultPrice,
+        defaultPaymentType,
         defaultCurrency,
         defaultTermsAndConditions: defaultTermsAndConditions || null,
       })
@@ -52,7 +64,18 @@ export async function createProject(formData: FormData) {
   const price = formData.get("price")
     ? parseInt(formData.get("price") as string)
     : 0;
-  const currency = (formData.get("currency") as string) || "SEK";
+  const paymentType =
+    (formData.get("paymentType") as "one-time" | "monthly" | "yearly") ||
+    "one-time";
+  const currency =
+    (formData.get("currency") as
+      | "SEK"
+      | "USD"
+      | "EUR"
+      | "GBP"
+      | "DKK"
+      | "NOK"
+      | "CHF") || "SEK";
   const termsAndConditions = formData.get("termsAndConditions") as
     | string
     | null;
@@ -65,7 +88,8 @@ export async function createProject(formData: FormData) {
     // If templateId is provided, get default values from template
     let defaultValues = {
       price: 0,
-      currency: "SEK",
+      paymentType: "one-time" as "one-time" | "monthly" | "yearly",
+      currency: "SEK" as "SEK" | "USD" | "EUR" | "GBP" | "DKK" | "NOK" | "CHF",
       termsAndConditions: null as string | null,
     };
 
@@ -79,6 +103,7 @@ export async function createProject(formData: FormData) {
       if (template) {
         defaultValues = {
           price: template.defaultPrice || 0,
+          paymentType: template.defaultPaymentType || "one-time",
           currency: template.defaultCurrency || "SEK",
           termsAndConditions: template.defaultTermsAndConditions,
         };
@@ -93,6 +118,7 @@ export async function createProject(formData: FormData) {
         description: description || null,
         customerId: customerId,
         price: price || defaultValues.price,
+        paymentType: paymentType || defaultValues.paymentType,
         currency: currency || defaultValues.currency,
         termsAndConditions:
           termsAndConditions || defaultValues.termsAndConditions,

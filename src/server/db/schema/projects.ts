@@ -17,6 +17,22 @@ export const projectStatus = pgEnum("project_status", [
   "archived",
 ]);
 
+export const paymentType = pgEnum("payment_type", [
+  "one-time",
+  "monthly",
+  "yearly",
+]);
+
+export const currency = pgEnum("currency", [
+  "SEK",
+  "USD",
+  "EUR",
+  "GBP",
+  "DKK",
+  "NOK",
+  "CHF",
+]);
+
 export const contract = pgTable("contract", {
   id: serial("id").primaryKey(),
   contract: text("contract").notNull(),
@@ -30,7 +46,8 @@ export const projectTemplate = pgTable("project_template", {
   name: text("name").notNull().unique(), // "SEO", "Website", "ADS"
   description: text("description"),
   defaultPrice: integer("default_price").default(0),
-  defaultCurrency: text("default_currency").default("SEK"),
+  defaultPaymentType: paymentType("default_payment_type").default("one-time"),
+  defaultCurrency: currency("default_currency").default("SEK"),
   defaultTermsAndConditions: text("default_terms_and_conditions"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
@@ -44,7 +61,8 @@ export const projects = pgTable("projects", {
   customerId: integer("customer_id"),
   termsAndConditions: text("terms_and_conditions"),
   price: integer("price").notNull().default(0),
-  currency: text("currency").notNull().default("SEK"),
+  paymentType: paymentType("payment_type").notNull().default("one-time"),
+  currency: currency("currency").notNull().default("SEK"),
   status: projectStatus("status").notNull().default("draft"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
