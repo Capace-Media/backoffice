@@ -8,36 +8,14 @@ import {
 } from "@/components/ui/card";
 
 import useAppForm from "@/components/form/useAppForm";
-import { z } from "zod";
 import { createTemplate } from "../actions/create";
 import { useRouter } from "next/navigation";
-
-export const createProjectTemplateSchema = z.object({
-  name: z.string().min(1),
-  description: z.string().optional(),
-  defaultPrice: z.number().min(0),
-  defaultCurrency: z.enum(["SEK", "USD", "EUR", "GBP", "DKK", "NOK", "CHF"]),
-  defaultPaymentType: z.enum(["one-time", "monthly", "yearly"]),
-  defaultTermsAndConditions: z.string().optional(),
-});
-
-export const currencyOptions = [
-  { value: "SEK", label: "SEK" },
-  { value: "USD", label: "USD" },
-  { value: "EUR", label: "EUR" },
-  { value: "GBP", label: "GBP" },
-  { value: "DKK", label: "DKK" },
-  { value: "NOK", label: "NOK" },
-  { value: "CHF", label: "CHF" },
-];
-export const paymentTypeOptions = [
-  { value: "one-time", label: "One-time Payment" },
-  { value: "monthly", label: "Monthly Subscription" },
-  { value: "yearly", label: "Yearly Subscription" },
-];
-export type CreateProjectTemplateSchema = z.infer<
-  typeof createProjectTemplateSchema
->;
+import {
+  createProjectTemplateSchema,
+  CreateProjectTemplateSchema,
+  currencyOptions,
+  paymentTypeOptions,
+} from "../schemas";
 export default function CreateProjectTemplate() {
   const router = useRouter();
   const defaultValues = {
@@ -50,7 +28,7 @@ export default function CreateProjectTemplate() {
   } as CreateProjectTemplateSchema;
   const form = useAppForm({
     validators: {
-      onChange: createProjectTemplateSchema,
+      onChange: createProjectTemplateSchema as any,
     },
     defaultValues,
     onSubmit: async (values) => {
@@ -87,7 +65,7 @@ export default function CreateProjectTemplate() {
               {(field) => <field.Textarea label="Description" />}
             </form.AppField>
             <form.AppField name="defaultPrice">
-              {(field) => <field.Input label="Default Price" />}
+              {(field) => <field.Input label="Default Price" type="number" />}
             </form.AppField>
             <form.AppField name="defaultCurrency">
               {(field) => (
