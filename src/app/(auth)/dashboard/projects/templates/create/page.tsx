@@ -1,4 +1,4 @@
-import CreateProjectTemplate from "@/components/project/create/form";
+import CreateProjectTemplate from "@/app/(auth)/dashboard/projects/components/form";
 
 export default function CreateProjectTemplatePage() {
   return (

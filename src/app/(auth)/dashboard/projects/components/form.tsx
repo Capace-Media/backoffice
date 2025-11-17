@@ -9,6 +9,8 @@ import {
 
 import useAppForm from "@/components/form/useAppForm";
 import { z } from "zod";
+import { createTemplate } from "../actions/create";
+import { useRouter } from "next/navigation";
 
 export const createProjectTemplateSchema = z.object({
   name: z.string().min(1),
@@ -37,6 +39,7 @@ export type CreateProjectTemplateSchema = z.infer<
   typeof createProjectTemplateSchema
 >;
 export default function CreateProjectTemplate() {
+  const router = useRouter();
   const defaultValues = {
     name: "",
     description: "",
@@ -52,6 +55,12 @@ export default function CreateProjectTemplate() {
     defaultValues,
     onSubmit: async (values) => {
       console.log(values);
+      const result = await createTemplate(values.value);
+      if (result.success) {
+        router.push("/dashboard/projects");
+      } else {
+        console.error(result.message);
+      }
     },
   });
   return (
