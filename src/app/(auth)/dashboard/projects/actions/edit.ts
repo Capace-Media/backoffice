@@ -3,7 +3,7 @@
 import { projectTemplate } from "@/server/db/schema";
 import {
   createProjectTemplateSchema,
-  CreateProjectTemplateSchema,
+  TCreateProjectTemplateSchema,
 } from "../schemas";
 import { db } from "@/server/connection";
 import { eq } from "drizzle-orm";
@@ -14,7 +14,7 @@ export type Response = {
 };
 
 export async function editTemplate(
-  props: CreateProjectTemplateSchema,
+  props: TCreateProjectTemplateSchema,
   slug: string
 ): Promise<Response> {
   const validatedData = createProjectTemplateSchema.parse(props);
