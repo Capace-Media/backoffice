@@ -34,14 +34,14 @@ export default function DashboardLayout({
             </SidebarHeader>
             <DashboardNav />
           </Sidebar>
-          <main className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col">
             <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4">
               <SidebarTrigger />
               <div className="flex-1" />
               <ModeToggle />
             </header>
             <div className="flex flex-1 flex-col overflow-auto">{children}</div>
-          </main>
+          </div>
         </div>
       </Providers>
     </SidebarProvider>

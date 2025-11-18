@@ -44,7 +44,8 @@ export default function CreateProjectTemplate() {
       console.log(values);
       const result = await createTemplate(values.value);
       if (result.success) {
-        router.push("/dashboard/projects");
+        // router.push("/dashboard/projects");
+        form.reset();
       } else {
         console.error(result.message);
       }

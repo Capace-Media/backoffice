@@ -37,8 +37,6 @@ export async function createTemplate(
       })
       .returning();
 
-    console.log("New template:", newTemplate);
-
     return { success: true, message: "Template created successfully" };
   } catch (error) {
     console.error("Database error:", error);
