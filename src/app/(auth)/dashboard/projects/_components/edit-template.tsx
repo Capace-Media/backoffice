@@ -1,40 +1,51 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
-import useAppForm from "@/components/form/useAppForm";
-import { createTemplate } from "../actions/create";
-import { useRouter } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
-  createProjectTemplateSchema,
+  Field,
+  FieldSet,
+  FieldGroup,
+  FieldLabel,
+  FieldDescription,
+  FieldLegend,
+  FieldSeparator,
+} from "@/components/ui/field";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+
+import {
   TCreateProjectTemplateSchema,
+  createProjectTemplateSchema,
   currencyOptions,
   paymentTypeOptions,
 } from "../schemas";
-import {
-  Field,
-  FieldDescription,
-  FieldGroup,
-  FieldLabel,
-  FieldLegend,
-  FieldSeparator,
-  FieldSet,
-} from "@/components/ui/field";
-export default function CreateProjectTemplate() {
-  const router = useRouter();
-  const defaultValues = {
+import { editTemplate } from "../actions/edit";
+import useAppForm from "@/components/form/useAppForm";
+
+type Props = {
+  slug: string;
+};
+
+export default function EditTemplate(props: Props) {
+  const queryClient = useQueryClient();
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["template", props.slug],
+    queryFn: async () => {
+      const response = await fetch(`/api/project/template?slug=${props.slug}`);
+      const result = await response.json();
+      return result;
+    },
+  });
+
+  const defaultValues: TCreateProjectTemplateSchema = {
     name: "",
     description: "",
     defaultPrice: 0,
     defaultCurrency: "SEK",
     defaultPaymentType: "one-time",
     defaultTermsAndConditions: "",
-  } as TCreateProjectTemplateSchema;
+  };
+
   const form = useAppForm({
     validators: {
       onChange: createProjectTemplateSchema as any,
@@ -42,20 +53,40 @@ export default function CreateProjectTemplate() {
     defaultValues,
     onSubmit: async (values) => {
       console.log(values);
-      const result = await createTemplate(values.value);
+      const result = await editTemplate(values.value, props.slug);
       if (result.success) {
-        // router.push("/dashboard/projects");
-        form.reset();
+        queryClient.invalidateQueries({ queryKey: ["template", props.slug] });
+        queryClient.invalidateQueries({ queryKey: ["templates"] });
       } else {
         console.error(result.message);
       }
     },
   });
+
+  // Update form values when data loads
+  useEffect(() => {
+    if (data?.data) {
+      const template = data.data;
+      form.reset({
+        name: template.name || "",
+        description: template.description || "",
+        defaultPrice: template.defaultPrice || 0,
+        defaultCurrency: template.defaultCurrency || "SEK",
+        defaultPaymentType: template.defaultPaymentType || "one-time",
+        defaultTermsAndConditions: template.defaultTermsAndConditions || "",
+      });
+    }
+  }, [data, form]);
+
+  // Handle loading and error states after hooks
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data) return <div>No data</div>;
   return (
     <div className="container mx-auto py-8 max-w-2xl">
       <Card>
         <CardHeader>
-          <CardTitle>Create Project Template</CardTitle>
+          <CardTitle>Edit Project Template</CardTitle>
         </CardHeader>
         <CardContent>
           <form
@@ -134,8 +165,8 @@ export default function CreateProjectTemplate() {
                       <form.Submit className="w-full">
                         {" "}
                         {form.state.isSubmitting
-                          ? "Creating project template..."
-                          : "Create Project Template"}
+                          ? "Updating project template..."
+                          : "Update Project Template"}
                       </form.Submit>
                     </form.AppForm>
                   </Field>

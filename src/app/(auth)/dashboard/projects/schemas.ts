@@ -9,7 +9,7 @@ export const createProjectTemplateSchema = z.object({
   defaultTermsAndConditions: z.string().optional().nullable(),
 });
 
-export type CreateProjectTemplateSchema = z.infer<
+export type TCreateProjectTemplateSchema = z.infer<
   typeof createProjectTemplateSchema
 >;
 
