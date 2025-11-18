@@ -4,11 +4,11 @@ import { defineConfig } from "drizzle-kit";
 // Use DATABASE_URL_DEV for local development (preview/dev branch)
 // Use DATABASE_URL for production (main branch)
 // Fallback to DATABASE_URL if DATABASE_URL_DEV is not set
-const databaseUrl = process.env.DATABASE_URL_DEV || process.env.DATABASE_URL;
+const databaseUrl = process.env.POSTGRES_URL;
 
 if (!databaseUrl) {
   throw new Error(
-    "DATABASE_URL or DATABASE_URL_DEV environment variable is required"
+    "POSTGRES_URL or POSTGRES_URL_DEV environment variable is required"
   );
 }
 

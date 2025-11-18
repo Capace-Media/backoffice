@@ -1,60 +1,88 @@
 "use client";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
-import useAppForm from "@/components/form/useAppForm";
-import { createTemplate } from "../actions/create";
-import { useRouter } from "next/navigation";
-import {
-  createProjectTemplateSchema,
-  CreateProjectTemplateSchema,
-  currencyOptions,
-  paymentTypeOptions,
-} from "../schemas";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
-  FieldDescription,
+  FieldSet,
   FieldGroup,
   FieldLabel,
+  FieldDescription,
   FieldLegend,
   FieldSeparator,
-  FieldSet,
+  FieldContent,
 } from "@/components/ui/field";
-export default function CreateProjectTemplate() {
-  const router = useRouter();
-  const defaultValues = {
-    name: "",
-    description: "",
-    defaultPrice: 0,
-    defaultCurrency: "SEK",
-    defaultPaymentType: "one-time",
-    defaultTermsAndConditions: "",
-  } as CreateProjectTemplateSchema;
-  const form = useAppForm({
-    validators: {
-      onChange: createProjectTemplateSchema as any,
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useEffect } from "react";
+
+import { currencyOptions, paymentTypeOptions } from "../schemas";
+import { editTemplate } from "../actions/edit";
+import useAppForm from "@/components/form/useAppForm";
+import {
+  editTemplateSchema,
+  TeditTemplateSchema,
+} from "@/lib/zod-schemas/template";
+import { FormValidateOrFn } from "@tanstack/react-form";
+
+type Props = {
+  slug: string;
+};
+
+export default function EditTemplate(props: Props) {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["template", props.slug],
+    queryFn: async () => {
+      const response = await fetch(`/api/project/template?slug=${props.slug}`);
+      const result = await response.json();
+      return result;
     },
-    defaultValues,
+  });
+
+  if (!data?.data) {
+    return <div>No data</div>;
+  }
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data) return <div>No data</div>;
+
+  const template = data.data;
+  return <EditTemplateForm slug={props.slug} template={template} />;
+}
+
+function EditTemplateForm(props: { slug: string; template: any }) {
+  const queryClient = useQueryClient();
+  const form = useAppForm({
+    defaultValues: {
+      name: props.template.name ?? "",
+      description: props.template.description ?? "",
+      defaultPrice: props.template.defaultPrice ?? 0,
+      defaultCurrency: props.template.defaultCurrency ?? "SEK",
+      defaultPaymentType: props.template.defaultPaymentType ?? "one-time",
+      defaultTermsAndConditions: props.template.defaultTermsAndConditions ?? "",
+      active: props.template.active ?? true,
+    } as TeditTemplateSchema,
+    validators: {
+      onChange: editTemplateSchema as FormValidateOrFn<TeditTemplateSchema>,
+    },
+
     onSubmit: async (values) => {
       console.log(values);
-      const result = await createTemplate(values.value);
+      const result = await editTemplate(values.value, props.slug);
       if (result.success) {
-        router.push("/dashboard/projects");
+        queryClient.invalidateQueries({ queryKey: ["template", props.slug] });
+        queryClient.invalidateQueries({ queryKey: ["templates"] });
       } else {
         console.error(result.message);
       }
     },
   });
+
+  // Handle loading and error states after hooks
+
   return (
     <div className="container mx-auto py-8 max-w-2xl">
       <Card>
         <CardHeader>
-          <CardTitle>Create Project Template</CardTitle>
+          <CardTitle>Edit Project Template</CardTitle>
         </CardHeader>
         <CardContent>
           <form
@@ -111,6 +139,17 @@ export default function CreateProjectTemplate() {
                       </form.AppField>
                     </Field>
                   </div>
+                  <Field orientation="horizontal">
+                    <form.AppField name="active">
+                      {(field) => <field.Checkbox />}
+                    </form.AppField>
+                    <FieldContent>
+                      <FieldLabel htmlFor="active">Active</FieldLabel>
+                      <FieldDescription>
+                        Whether the template is active or not.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
                 </FieldGroup>
               </FieldSet>
               <FieldSeparator />
@@ -133,8 +172,8 @@ export default function CreateProjectTemplate() {
                       <form.Submit className="w-full">
                         {" "}
                         {form.state.isSubmitting
-                          ? "Creating project template..."
-                          : "Create Project Template"}
+                          ? "Updating project template..."
+                          : "Update Project Template"}
                       </form.Submit>
                     </form.AppForm>
                   </Field>

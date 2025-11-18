@@ -3,7 +3,7 @@
 import { projectTemplate } from "@/server/db/schema";
 import {
   createProjectTemplateSchema,
-  CreateProjectTemplateSchema,
+  TCreateProjectTemplateSchema,
 } from "../schemas";
 import { db } from "@/server/connection";
 
@@ -13,7 +13,7 @@ export type Response = {
 };
 
 export async function createTemplate(
-  props: CreateProjectTemplateSchema
+  props: TCreateProjectTemplateSchema
 ): Promise<Response> {
   const validatedData = createProjectTemplateSchema.parse(props);
 
@@ -36,8 +36,6 @@ export async function createTemplate(
           validatedData.defaultTermsAndConditions ?? null,
       })
       .returning();
-
-    console.log("New template:", newTemplate);
 
     return { success: true, message: "Template created successfully" };
   } catch (error) {
