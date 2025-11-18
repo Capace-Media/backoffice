@@ -39,14 +39,15 @@ const navigation = [
         icon: FolderKanban,
       },
       {
-        title: "Create Project",
-        url: "/dashboard/projects/create",
-        icon: Plus,
+        title: "All Templates",
+        url: "/dashboard/projects/templates",
+        icon: FileStack,
       },
+
       {
         title: "Create Template",
         url: "/dashboard/projects/templates/create",
-        icon: FileStack,
+        icon: Plus,
       },
     ],
   },
@@ -97,4 +98,3 @@ export function DashboardNav() {
     </SidebarContent>
   );
 }
-

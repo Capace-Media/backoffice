@@ -1,17 +1,15 @@
 import { Button } from "@/components/ui/button";
 
-import { Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useFormContext } from "../useAppForm";
+import React from "react";
+import { Spinner } from "@/components/ui/spinner";
 
-interface SubmitButtonProps {
-  children: React.ReactNode;
-  disabled?: boolean;
-  className?: string;
-}
+type SubmitButtonProps = {
+  children?: React.ReactNode;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>;
 
-export function SubmitButton(props: SubmitButtonProps) {
-  const { disabled = false } = props;
+export const SubmitButton = ({ children, ...props }: SubmitButtonProps) => {
   const form = useFormContext();
 
   return (
@@ -20,22 +18,24 @@ export function SubmitButton(props: SubmitButtonProps) {
         <Button
           type="submit"
           size="default"
-          disabled={isSubmitting || !canSubmit || disabled}
+          disabled={isSubmitting || !canSubmit || props.disabled}
           className={cn(
-            isSubmitting || !canSubmit || (disabled && "cursor-not-allowed"),
+            isSubmitting ||
+              !canSubmit ||
+              (props.disabled && "cursor-not-allowed"),
             props.className
           )}
         >
           {isSubmitting ? (
             <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              {props.children}
+              <Spinner />
+              {children}
             </>
           ) : (
-            props.children
+            children
           )}
         </Button>
       )}
     </form.Subscribe>
   );
-}
+};
