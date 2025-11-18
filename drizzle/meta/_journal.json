@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1763369222419,
+      "tag": "0000_organic_rogue",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763375664564,
+      "tag": "0001_redundant_moon_knight",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763383284300,
+      "tag": "0002_demonic_lady_ursula",
+      "breakpoints": true
+    }
+  ]
+}
