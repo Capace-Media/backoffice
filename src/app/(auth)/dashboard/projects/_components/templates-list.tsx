@@ -14,6 +14,7 @@ import {
 } from "@/components/ui/item";
 import { Button } from "@/components/ui/button";
 import { PencilIcon } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function TemplatesList() {
   const { data, isLoading, error } = useQuery({
@@ -28,7 +29,31 @@ export default function TemplatesList() {
     },
   });
   if (isLoading) {
-    return <div>Loading...</div>;
+    return (
+      <ItemGroup className="grid grid-cols-3 gap-4">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <Item variant="outline" key={i}>
+            <ItemHeader>
+              <Skeleton className="h-6 w-32" />
+              <ItemActions>
+                <Skeleton className="h-9 w-9 rounded-full" />
+              </ItemActions>
+            </ItemHeader>
+            <ItemContent className="space-y-4">
+              <div className="flex items-baseline gap-2">
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-4 w-12" />
+              </div>
+              <Separator />
+              <div className="flex items-center gap-2">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-5 w-20 rounded-full" />
+              </div>
+            </ItemContent>
+          </Item>
+        ))}
+      </ItemGroup>
+    );
   }
   if (error) {
     return <div>Error: {error.message}</div>;
