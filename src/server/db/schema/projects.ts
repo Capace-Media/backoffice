@@ -1,4 +1,5 @@
 import {
+  boolean,
   integer,
   pgEnum,
   pgTable,
@@ -44,6 +45,7 @@ export const contract = pgTable("contract", {
 export const projectTemplate = pgTable("project_template", {
   id: serial("id").primaryKey(),
   name: text("name").notNull().unique(), // "SEO", "Website", "ADS"
+  active: boolean("active").notNull().default(true),
   description: text("description"),
   defaultPrice: integer("default_price").default(0),
   defaultPaymentType: paymentType("default_payment_type").default("one-time"),

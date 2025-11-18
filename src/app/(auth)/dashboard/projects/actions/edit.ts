@@ -1,12 +1,13 @@
 "use server";
 
 import { projectTemplate } from "@/server/db/schema";
-import {
-  createProjectTemplateSchema,
-  TCreateProjectTemplateSchema,
-} from "../schemas";
+
 import { db } from "@/server/connection";
 import { eq } from "drizzle-orm";
+import {
+  editTemplateSchema,
+  TeditTemplateSchema,
+} from "@/lib/zod-schemas/template";
 
 export type Response = {
   success: boolean;
@@ -14,21 +15,21 @@ export type Response = {
 };
 
 export async function editTemplate(
-  props: TCreateProjectTemplateSchema,
+  props: TeditTemplateSchema,
   slug: string
 ): Promise<Response> {
-  const validatedData = createProjectTemplateSchema.parse(props);
+  const validatedData = editTemplateSchema.safeParse(props);
 
-  if (!validatedData) {
+  if (!validatedData.success) {
     return { success: false, message: "Invalid data" };
   }
 
-  console.log("Validated data:", validatedData);
+  console.log("Validated data:", validatedData.data);
 
   try {
     await db
       .update(projectTemplate)
-      .set(validatedData)
+      .set(validatedData.data)
       .where(eq(projectTemplate.id, parseInt(slug, 10)));
 
     return { success: true, message: "Template updated successfully" };

@@ -13,7 +13,7 @@ import {
   ItemTitle,
 } from "@/components/ui/item";
 import { buttonVariants } from "@/components/ui/button";
-import { PencilIcon } from "lucide-react";
+import { CircleCheckIcon, CircleXIcon, PencilIcon } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useState } from "react";
 import { PaginationController } from "@/components/pagination-controller";
@@ -79,19 +79,36 @@ export default function TemplatesList() {
       <ItemGroup className="grid grid-cols-3 gap-4">
         {templates.map((template: any) => (
           <Item variant="outline" key={template.id}>
-            <ItemHeader>
-              <ItemTitle className="text-lg">{template.name}</ItemTitle>
-              <ItemActions>
-                <Link
-                  href={`/dashboard/projects/templates/${template.id}`}
-                  className={cn(
-                    buttonVariants({ variant: "ghost", size: "icon" }),
-                    "rounded-full"
-                  )}
-                >
-                  <PencilIcon />
-                </Link>
-              </ItemActions>
+            <ItemHeader className="flex flex-col gap-2 items-start">
+              <div className="flex items-center justify-between w-full gap-2">
+                {template.active ? (
+                  <div className="flex items-center gap-2">
+                    <CircleCheckIcon className="size-4 text-green-500" />
+                    <span className="text-sm text-muted-foreground">
+                      Active
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2">
+                    <CircleXIcon className="size-4 text-red-500" />
+                    <span className="text-sm text-muted-foreground">
+                      Inactive
+                    </span>
+                  </div>
+                )}
+                <ItemActions>
+                  <Link
+                    href={`/dashboard/projects/templates/${template.id}`}
+                    className={cn(
+                      buttonVariants({ variant: "ghost", size: "icon" }),
+                      "rounded-full"
+                    )}
+                  >
+                    <PencilIcon />
+                  </Link>
+                </ItemActions>
+              </div>
+              <ItemTitle className="text-lg"> {template.name}</ItemTitle>
             </ItemHeader>
             <ItemContent className="space-y-4">
               <div className="flex items-baseline gap-2">

@@ -7,6 +7,7 @@ export const createProjectTemplateSchema = z.object({
   defaultCurrency: z.enum(["SEK", "USD", "EUR", "GBP", "DKK", "NOK", "CHF"]),
   defaultPaymentType: z.enum(["one-time", "monthly", "yearly"]),
   defaultTermsAndConditions: z.string().optional().nullable(),
+  active: z.boolean().default(true),
 });
 
 export type TCreateProjectTemplateSchema = z.infer<

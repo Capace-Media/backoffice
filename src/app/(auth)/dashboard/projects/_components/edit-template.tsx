@@ -9,25 +9,25 @@ import {
   FieldDescription,
   FieldLegend,
   FieldSeparator,
+  FieldContent,
 } from "@/components/ui/field";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect } from "react";
 
-import {
-  TCreateProjectTemplateSchema,
-  createProjectTemplateSchema,
-  currencyOptions,
-  paymentTypeOptions,
-} from "../schemas";
+import { currencyOptions, paymentTypeOptions } from "../schemas";
 import { editTemplate } from "../actions/edit";
 import useAppForm from "@/components/form/useAppForm";
+import {
+  editTemplateSchema,
+  TeditTemplateSchema,
+} from "@/lib/zod-schemas/template";
+import { FormValidateOrFn } from "@tanstack/react-form";
 
 type Props = {
   slug: string;
 };
 
 export default function EditTemplate(props: Props) {
-  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ["template", props.slug],
     queryFn: async () => {
@@ -37,20 +37,33 @@ export default function EditTemplate(props: Props) {
     },
   });
 
-  const defaultValues: TCreateProjectTemplateSchema = {
-    name: "",
-    description: "",
-    defaultPrice: 0,
-    defaultCurrency: "SEK",
-    defaultPaymentType: "one-time",
-    defaultTermsAndConditions: "",
-  };
+  if (!data?.data) {
+    return <div>No data</div>;
+  }
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
+  if (!data) return <div>No data</div>;
 
+  const template = data.data;
+  return <EditTemplateForm slug={props.slug} template={template} />;
+}
+
+function EditTemplateForm(props: { slug: string; template: any }) {
+  const queryClient = useQueryClient();
   const form = useAppForm({
+    defaultValues: {
+      name: props.template.name ?? "",
+      description: props.template.description ?? "",
+      defaultPrice: props.template.defaultPrice ?? 0,
+      defaultCurrency: props.template.defaultCurrency ?? "SEK",
+      defaultPaymentType: props.template.defaultPaymentType ?? "one-time",
+      defaultTermsAndConditions: props.template.defaultTermsAndConditions ?? "",
+      active: props.template.active ?? true,
+    } as TeditTemplateSchema,
     validators: {
-      onChange: createProjectTemplateSchema as any,
+      onChange: editTemplateSchema as FormValidateOrFn<TeditTemplateSchema>,
     },
-    defaultValues,
+
     onSubmit: async (values) => {
       console.log(values);
       const result = await editTemplate(values.value, props.slug);
@@ -63,25 +76,8 @@ export default function EditTemplate(props: Props) {
     },
   });
 
-  // Update form values when data loads
-  useEffect(() => {
-    if (data?.data) {
-      const template = data.data;
-      form.reset({
-        name: template.name || "",
-        description: template.description || "",
-        defaultPrice: template.defaultPrice || 0,
-        defaultCurrency: template.defaultCurrency || "SEK",
-        defaultPaymentType: template.defaultPaymentType || "one-time",
-        defaultTermsAndConditions: template.defaultTermsAndConditions || "",
-      });
-    }
-  }, [data, form]);
-
   // Handle loading and error states after hooks
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>;
-  if (!data) return <div>No data</div>;
+
   return (
     <div className="container mx-auto py-8 max-w-2xl">
       <Card>
@@ -143,6 +139,17 @@ export default function EditTemplate(props: Props) {
                       </form.AppField>
                     </Field>
                   </div>
+                  <Field orientation="horizontal">
+                    <form.AppField name="active">
+                      {(field) => <field.Checkbox />}
+                    </form.AppField>
+                    <FieldContent>
+                      <FieldLabel htmlFor="active">Active</FieldLabel>
+                      <FieldDescription>
+                        Whether the template is active or not.
+                      </FieldDescription>
+                    </FieldContent>
+                  </Field>
                 </FieldGroup>
               </FieldSet>
               <FieldSeparator />
